@@ -1,0 +1,19 @@
+INTRODUCTION
+	De nos jours, les recherches  sur l’intelligence artificiel (IA) prend de l’envergure.  L’application de genre de technologie peut être utiliser dans de nombreuse domaine. L’IA va transformer la manière dont les hommes travaillent avec les machines, amplifiant notre créativité et nos compétences. L’IA est une constellation de technologies capable de donner aux machines les capacités de percevoir, comprendre, agir et apprendre afin d'augmenter les capacités humaines. L’IA commence aussi d’intervenir dans les milieux médicaux, celui-ci aide à avoir des résultats d’analyse médicale  plus rapide.
+	Dans ce type d’intervention que nous avons abordé notre sujet, qui s’intitule « Réseau de neurone à convolution » . Notre réseau de neurone interviendra dans la reconnaissance d’image, on l’utilisera dans la détection des cancer.
+
+ÉTAT DE L’ART SUR LES RÉSEAUX DE NEURONE
+	1. Généralités sur les réseau de neurone
+a) Définition
+	Un réseau de neurones artificiels, ou réseau neuronal artificiel, est un système dont la conception est à l'origine schématiquement inspirée du fonctionnement des neurones biologiques, et qui par la suite s'est rapproché des méthodes statistiques.
+b) Différents types de réseau de neurone
+En général on distingue plusieurs types de réseau de neurone, voici deux exemple le réseau de neurone récurrents et le réseau de neurone à convolution.
+    • Le réseau de neurone récurrent sauvegardent les résultats produits par les nœuds de traitement et nourrissent le modèle à l’aide de ces résultats.
+    • Le réseau de neurone à convolution, qui sont de plus en plus utilisés dans différents domaines : reconnaissance faciale, numérisation de texte, traitement naturel du langage…
+
+
+PRÉSENTATION DES MÉTHODES
+
+RÉSULTATS
+
+CONCLUSION
