@@ -63,6 +63,6 @@ ppm_t *ppm_create(u64 h, u64 w, u64 t);
 
 void testing(float w[][100],int n_w,int n_h,ppm_t *pp_images,float *h);
 
-pair trainer(int nn, ppm_t *pp_train_images);
+void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image);
 
 #endif
