@@ -9,7 +9,7 @@ float d_sigmoid(float x)
 }
 
 //fonction sigmoid
-static inline float sigmoidbis(float x)
+inline float sigmoidbis(float x)
 {
     return 1.0 / (1.0 + exp(-x));
 }
