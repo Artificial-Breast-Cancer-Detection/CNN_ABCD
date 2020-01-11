@@ -151,9 +151,15 @@ void testing(float w[][100],int n_w,int n_h,ppm_t *pp_images,float *h) {
     _s = sigmoidbis(s);
 
     //output : cancer detection
-    char *output = "Cancer not detected\n";
-    printf("result : %s\n",output);
+    char *output1 = "Cancer not detected\n";
+    char *output2 = "Cancer detected\n";
+    
     printf("\nProbabilite: (%lf) %.0lf \n\nPress enter to continue ...", _s, nearbyint(_s));
+    if(nearbyint(_s) > 0.7){
+      printf("result : %s\n",output1);
+    }else{
+      printf("result : %s\n",output2);
+    }
 
     getchar();
     getchar();
