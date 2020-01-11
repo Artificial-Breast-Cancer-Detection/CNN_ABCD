@@ -53,14 +53,6 @@ void pgm_apply_kirsch_filter(byte *img_in, byte *img_out, u64 h, u64 w);
 
 void pgm_close(pgm_t *p);
 
-/*ppm_t *ppm_open(char *fname);
-
-void ppm_save(char *fname, ppm_t *p);
-
-void ppm_close(ppm_t *p);
-
-ppm_t *ppm_create(u64 h, u64 w, u64 t);*/
-
 void trainer(int nn, pgm_t *pp_train_images,pgm_t *test_image);
 
 void test(float w[][100],int n_w,int n_h,pgm_t *pp_images,float *h);
