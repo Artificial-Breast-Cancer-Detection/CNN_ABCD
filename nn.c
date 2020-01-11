@@ -9,7 +9,7 @@ float d_sigmoid(float x)
 }
 
 //fonction sigmoid
-float sigmoidbis(float x)
+static inline float sigmoidbis(float x)
 {
     return 1.0 / (1.0 + exp(-x));
 }
@@ -157,7 +157,6 @@ void testing(float w[][100],int n_w,int n_h,ppm_t *pp_images,float *h) {
 
     getchar();
     getchar();
-    //exit(0);
 }
 
 // fonction pour convertir les images en grayscale
@@ -183,11 +182,6 @@ inline u64 relu(u32 x){
   return res;
 }
 
-//fonction sigmoid
-static inline double sigmoid(double x)
-{
-  return 1.0 / (1.0 + exp(-x));  
-}
 
 //fonction pour ouvrir les images sous format pgm
 pgm_t *pgm_load(char *fname){
@@ -451,137 +445,4 @@ ppm_t *ppm_create(u64 h, u64 w, u64 t)
 
     return p;
 }
-
-//fonction d'entrainement du réseau de neurones
-void train(ppm_t *pp_train_images){
-int nb_images = 2500;   //Number of entries
-int n_w = 2500;  //Number of neurons in the input layer
-int n_h = 100;  //Number of neurons in the hidden layer
-char mode;
-int retrains = 0;
-double s, err, alpha = 1.0; //Sigmoid, error, learning rate
-
-//w : input layer weights, h : hidden layer weights
- double w[2500][100],h[100],lw[2500][100],lw_d[nb_images][100],lh[nb_images],lh_d[nb_images];
-
- srand(time(NULL));
-
- lbl1:
-
- //Init
-
- for (int i = 1; i <= n_w; i++)
-    for (int j = 1; j <= n_h; j++)
-      //w[i][j] = (2.0 * rand())/ RAND_MAX - 1;
-      w[j][i]=(sqrt(-2.0*log((double)rand()/RAND_MAX)))*(cos(6.28318530718*(double)rand()/RAND_MAX));
-  
-  
-  for (int i = 1; i <= n_h; i++)
-    //h[i] = (2.0 * rand()) / RAND_MAX - 1;
-    h[i]=(sqrt(-2.0*log((double)rand()/RAND_MAX)))*(cos(6.28318530718*(double)rand()/RAND_MAX));
-
-  lbl2:
-  //It!
-  for (int i = 1;; i++)
-    {
-
-      //Forming lw
-      for (int j = 1; j <= nb_images; j++)
-	     {
-       	  for (int k = 1; k <= n_h; k++)
-	         {
-	           s = 0.0;
-	      
-	            for (int l = 1; l <= n_w; l++){
-	              s += (pp_train_images->px[j] * w[l][k]);}
-        
-
-	         lw[j][k] = sigmoid(s);
-           //printf("lw= %f\n",lw[j][k]);
-	         }
-	     }
-
-      err = 0.0;
-
-      //Forming lh_d
-      for (int j = 1; j <= nb_images; j++)
-	     {
-	       s = 0.0;
-
-	       for (int k = 1; k <= n_h; k++)
-	         s += (lw[j][k] * h[k]);
-
-	     lh[j] = sigmoid(s);
-	     err += fabs(lh[j] - pp_train_images->px[j]);
-	     lh_d[j] = (lh[j] - pp_train_images->px[j]) * sigmoid(lh[j]);
-	     }
-      //Forming lw_d
-      for (int j = 1; j <= nb_images; j++)
-	     for (int k = 1; k <= n_h; k++)
-	     lw_d[j][k] = lh_d[j] * h[k] * sigmoid(lw[j][k]);
-
-      //Updating w
-      for (int j = 1; j < n_w; j++)
-	     {
-	     for (int k = 1; k <= n_h; k++)
-	     {
-	      s = 0.0;
-
-	      for (int l = 1; l <= nb_images; l++)
-		    s += (pp_train_images->px[l] * lw_d[l][k]);
-
-	      w[j][k] -= (alpha * s);
-	     }
-	     }
-
-      //Updating h
-      for (int j = 1; j <= n_h; j++)
-	     {
-	       s = 0.0;
-
-	     for (int k = 1; k <= nb_images; k++){
-	       s += (lw[k][j] * lh_d[k]);}
-
-	       h[j] -= (alpha * s);
-	     }
-      
-      //
-  if (i == 100000)
-	 {
-	  double err_n = err / (double)nb_images;
-
-	  i = 0;
-	  
-	  //Roll around untill error is acceptable
-	  if (err_n > 0.1)
-	    {
-	      retrains++;
-	      goto lbl1;
-	    }
-
-	  retrains = 0;
-
-	  //Mean absolute error
-	  printf("retrains: %d, err: %lf\n", retrains, err_n); 
-	  
-	  getchar();
-
-	  printf("Retrain (0), Keep training (1)");
-	  mode = getchar();
-    if (mode == '0')
-      goto lbl1;
-    else
-      if (mode == '1')
-        goto lbl2;
-      else
-        return;
-	}
-	}
-  ppm_close(pp_train_images);
-}
-
-void test(ppm_t *test_image,int n_w,int n_h){
-  printf("Cancer detection");
-}
-
 
