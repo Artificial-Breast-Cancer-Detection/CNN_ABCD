@@ -73,7 +73,7 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
             }
         }
 
-        //Updating w
+        //Updating w0
         for (int j = 1; j < n_w; j++) {
             for (int k = 1; k <= n_h; k++) {
                 s = 0.0;
@@ -151,13 +151,13 @@ void testing(float w[][100],int n_w,int n_h,ppm_t *pp_images,float *h) {
     _s = sigmoidbis(s);
 
     //output : cancer detection
-    char *output = "Cancer detection\n";
+    char *output = "Cancer not detected\n";
     printf("result : %s\n",output);
     printf("\nProbabilite: (%lf) %.0lf \n\nPress enter to continue ...", _s, nearbyint(_s));
 
     getchar();
     getchar();
-    exit(0);
+    //exit(0);
 }
 
 // fonction pour convertir les images en grayscale
