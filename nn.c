@@ -15,7 +15,7 @@ float sigmoidbis(float x)
 }
 
 //fonction de train qui renvoie les poids du réseau
-void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
+void trainer(int nn, pgm_t *pp_train_images,pgm_t *test_image){
 
     //Layer inputs : n_w and hidden layer n_h
     int n_w = 2500,n_h = 100;
@@ -45,7 +45,7 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
         for (int i = 1; i <= n_h; i++){
             s = 0.0;
             for (int j = 1; j <= n_w; j++){
-                s += pp_train_images->px[j] * w0[j][i];
+                s += pp_train_images->p[j] * w0[j][i];
 
                 lw0[k][i] = sigmoidbis(s);
             }
@@ -79,7 +79,7 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
                 s = 0.0;
 
                 for (int l = 1; l <= nn; l++)
-                    s += (pp_train_images->px[l] * lw_d[l][k]);
+                    s += (pp_train_images->p[l] * lw_d[l][k]);
 
                 w0[j][k] -= (alpha * s);
             }
@@ -123,13 +123,13 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
                 goto lbl2;
             else
               if (mode == '2')
-                testing(w0,n_w,n_h,test_image,h);
+                test(w0,n_w,n_h,test_image,h);
         }
     }
 
 }
 
-void testing(float w[][100],int n_w,int n_h,ppm_t *pp_images,float *h) {
+void test(float w[][100],int n_w,int n_h,pgm_t *pp_images,float *h) {
 
     float s, _s,l[100];
 
@@ -138,7 +138,7 @@ void testing(float w[][100],int n_w,int n_h,ppm_t *pp_images,float *h) {
         s = 0.0;
 
         for (int j = 1; j <= n_w; j++)
-            s += pp_images->px[j] * w[j][i];
+            s += pp_images->p[j] * w[j][i];
 
         l[i] = sigmoidbis(s);
     }
@@ -160,34 +160,7 @@ void testing(float w[][100],int n_w,int n_h,ppm_t *pp_images,float *h) {
     exit(0);
 }
 
-// fonction pour convertir les images en grayscale
-ppm_t *rgbengrayscale(ppm_t *train_images){
 
-  for (int i = 0; i < train_images->w * train_images->h * 3; i += 3)
-    {
-      //red   --> light gray image
-      //green --> dark gray image (b&w photograph)
-      //blue  --> darker gray image (old b&w photograph)
-      byte gray = train_images->px[i + 2];
-
-      train_images->px[i]     = gray;
-      train_images->px[i + 1] = gray;
-      train_images->px[i + 2] = gray;
-    }
-    return train_images;
-}
-
-// fonction de rectification linéaire : permet d'écraser les valeurs entre 0 et 1
-inline u64 relu(u32 x){
-  u64 res = max(0,x);
-  return res;
-}
-
-//fonction sigmoid
-static inline double sigmoid(double x)
-{
-  return 1.0 / (1.0 + exp(-x));
-}
 
 //fonction pour ouvrir les images sous format pgm
 pgm_t *pgm_load(char *fname){
@@ -249,16 +222,33 @@ pgm_t *pgm_create(u64 h, u64 w, u64 t)
     return p;
 }
 
-//
-void pgm_close(pgm_t *p)
-{
-  if (p)
-    {
-      if (p->p)
-	free(p->p);
+// fonction pour convertir les images en grayscale
+pgm_t *rgbengrayscale(pgm_t *train_images){
 
-      free(p);
+  for (int i = 0; i < train_images->w * train_images->h * 3; i += 3)
+    {
+      //red   --> light gray image
+      //green --> dark gray image (b&w photograph)
+      //blue  --> darker gray image (old b&w photograph)
+      byte gray = train_images->p[i + 2];
+
+      train_images->p[i]     = gray;
+      train_images->p[i + 1] = gray;
+      train_images->p[i + 2] = gray;
     }
+    return train_images;
+}
+
+// fonction de rectification linéaire : permet d'écraser les valeurs entre 0 et 1
+inline u64 relu(u32 x){
+  u64 res = max(0,x);
+  return res;
+}
+
+//fonction sigmoid
+static inline double sigmoid(double x)
+{
+  return 1.0 / (1.0 + exp(-x));
 }
 
 //Convolution of two matrices (dotprod/FMA)
@@ -367,219 +357,13 @@ void pgm_apply_kirsch_filter(byte *img_in, byte *img_out, u64 h, u64 w)
       }
 }
 
-//
-ppm_t *ppm_open(char *fname)
+void pgm_close(pgm_t *p)
 {
-    char c0, c1, c;
-    FILE *fd = fopen(fname, "rb");
-
-    if (fd)
+  if (p)
     {
-        ppm_t *p = malloc(sizeof(ppm_t));
+      if (p->p)
+	free(p->p);
 
-        fscanf(fd, "%c%c\n", &c0, &c1);
-
-        c = fgetc(fd);
-
-        if (c == '#')
-        {
-            //Handle comment
-            while (c != '\n')
-                c = fgetc(fd);
-        }
-        else
-            fseek(fd, -1, SEEK_CUR);
-
-        fscanf(fd, "%d %d\n", &p->w, &p->h);
-        fscanf(fd, "%d\n", &p->t);
-
-        p->px = malloc(sizeof(byte) * p->w * p->h * 3);//h lines & w columns & 3 values per pixel(RGB)
-
-	if ((c0 == 'P') & (c1 == '6')) //Binary mode
-            {
-                fread(p->px, sizeof(byte), p->w * p->h * 3, fd);
-            }
-            else
-	      if ((c0 == 'P') & (c1 == '3')) //ASCII mode
-            {
-            }
-
-        fclose(fd);
-
-        return p;
+      free(p);
     }
-    else
-        return NULL;
-}
-
-//
-void ppm_save(char *fname, ppm_t *p)
-{
-    FILE *fd = fopen(fname, "wb");
-
-    fprintf(fd, "P6\n");
-    fprintf(fd, "%d %d\n", p->w, p->h);
-    fprintf(fd, "%d\n", 255);
-
-    fwrite(p->px, sizeof(byte), p->w * 3 * p->h, fd);
-
-    fclose(fd);
-}
-
-//
-void ppm_close(ppm_t *p)
-{
-    if (p)
-    {
-        if (p->px)
-            free(p->px);
-
-        free(p);
-    }
-}
-
-//fonction pour créer une image ppm de sortie
-ppm_t *ppm_create(u64 h, u64 w, u64 t)
-{
-    ppm_t *p = malloc(sizeof(ppm_t));
-
-    p->h = h;
-    p->w = w;
-    p->t = t;
-
-    p->px = malloc(sizeof(byte) * w * h);
-
-    return p;
-}
-
-//fonction d'entrainement du réseau de neurones
-void train(ppm_t *pp_train_images){
-int nb_images = 2500;   //Number of entries
-int n_w = 2500;  //Number of neurons in the input layer
-int n_h = 100;  //Number of neurons in the hidden layer
-char mode;
-int retrains = 0;
-double s, err, alpha = 1.0; //Sigmoid, error, learning rate
-
-//w : input layer weights, h : hidden layer weights
- double w[2500][100],h[100],lw[2500][100],lw_d[nb_images][100],lh[nb_images],lh_d[nb_images];
-
- srand(time(NULL));
-
- lbl1:
-
- //Init
-
- for (int i = 1; i <= n_w; i++)
-    for (int j = 1; j <= n_h; j++)
-      //w[i][j] = (2.0 * rand())/ RAND_MAX - 1;
-      w[j][i]=(sqrt(-2.0*log((double)rand()/RAND_MAX)))*(cos(6.28318530718*(double)rand()/RAND_MAX));
-
-
-  for (int i = 1; i <= n_h; i++)
-    //h[i] = (2.0 * rand()) / RAND_MAX - 1;
-    h[i]=(sqrt(-2.0*log((double)rand()/RAND_MAX)))*(cos(6.28318530718*(double)rand()/RAND_MAX));
-
-  lbl2:
-  //It!
-  for (int i = 1;; i++)
-    {
-
-      //Forming lw
-      for (int j = 1; j <= nb_images; j++)
-	     {
-       	  for (int k = 1; k <= n_h; k++)
-	         {
-	           s = 0.0;
-
-	            for (int l = 1; l <= n_w; l++){
-	              s += (pp_train_images->px[j] * w[l][k]);}
-
-
-	         lw[j][k] = sigmoid(s);
-           //printf("lw= %f\n",lw[j][k]);
-	         }
-	     }
-
-      err = 0.0;
-
-      //Forming lh_d
-      for (int j = 1; j <= nb_images; j++)
-	     {
-	       s = 0.0;
-
-	       for (int k = 1; k <= n_h; k++)
-	         s += (lw[j][k] * h[k]);
-
-	     lh[j] = sigmoid(s);
-	     err += fabs(lh[j] - pp_train_images->px[j]);
-	     lh_d[j] = (lh[j] - pp_train_images->px[j]) * sigmoid(lh[j]);
-	     }
-      //Forming lw_d
-      for (int j = 1; j <= nb_images; j++)
-	     for (int k = 1; k <= n_h; k++)
-	     lw_d[j][k] = lh_d[j] * h[k] * sigmoid(lw[j][k]);
-
-      //Updating w
-      for (int j = 1; j < n_w; j++)
-	     {
-	     for (int k = 1; k <= n_h; k++)
-	     {
-	      s = 0.0;
-
-	      for (int l = 1; l <= nb_images; l++)
-		    s += (pp_train_images->px[l] * lw_d[l][k]);
-
-	      w[j][k] -= (alpha * s);
-	     }
-	     }
-
-      //Updating h
-      for (int j = 1; j <= n_h; j++)
-	     {
-	       s = 0.0;
-
-	     for (int k = 1; k <= nb_images; k++){
-	       s += (lw[k][j] * lh_d[k]);}
-
-	       h[j] -= (alpha * s);
-	     }
-
-      //
-  if (i == 100000)
-	 {
-	  double err_n = err / (double)nb_images;
-
-	  i = 0;
-
-	  //Roll around untill error is acceptable
-	  if (err_n > 0.1)
-	    {
-	      retrains++;
-	      goto lbl1;
-	    }
-
-	  retrains = 0;
-
-	  //Mean absolute error
-	  printf("retrains: %d, err: %lf\n", retrains, err_n);
-
-	  getchar();
-
-	  printf("Retrain (0), Keep training (1)");
-	  mode = getchar();
-    if (mode == '0')
-      goto lbl1;
-    else
-      if (mode == '1')
-        goto lbl2;
-      else
-        return;
-	}
-	}
-  ppm_close(pp_train_images);
-}
-
-void test(ppm_t *test_image,int n_w,int n_h){
-  printf("Cancer detection");
 }

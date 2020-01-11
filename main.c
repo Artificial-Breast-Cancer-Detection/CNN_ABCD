@@ -6,17 +6,17 @@
 int main(int argc, char **argv)
 {
     if(argc<3){
-      return printf("Usage : [train ppm] [test ppm]\n"),-1;
+      return printf("Usage : [train pgm] [test pgm]\n"),-1;
     }
-    ppm_t *train_images;
+    pgm_t *train_images;
     //Loading images pre-processed, and training
 
-    train_images = ppm_open(argv[1]);
+    train_images = pgm_load(argv[1]);
 
     //Loading images, preprocessing, and testing
-    ppm_t *test_images;
+    pgm_t *test_images;
     //for (int i = 0; i < NB_IMAGES; i++) {
-    test_images = ppm_open(argv[2]);            //Load test image
+    test_images = pgm_load(argv[2]);            //Load test image
     trainer(1,train_images,test_images);
 
 
