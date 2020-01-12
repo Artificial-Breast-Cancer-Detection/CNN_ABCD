@@ -11,6 +11,7 @@ nn: main.o nn.o
 	$(CC) $(CFLAGS) $(DFLAGS) -c -o $@ $< $(LFLAGS)
 
 nn.o : protos.h
+
 main.o : protos.h
 
 filtre: filtre.o nn.o
