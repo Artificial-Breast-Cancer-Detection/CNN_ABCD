@@ -150,8 +150,8 @@ void test(float w[][100],int n_w,int n_h,pgm_t *pp_images,float *h) {
 
     _s = sigmoidbis(s);
 
-    //output : cancer detection
-    char *output = "Cancer detection\n";
+    //output : cancer not detection
+    char *output = "Cancer not detection\n";
     printf("result : %s\n",output);
     printf("\nProbabilite: (%lf) %.0lf \n\nPress enter to continue ...", _s, nearbyint(_s));
 
