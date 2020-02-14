@@ -8,7 +8,9 @@ int main(int argc, char **argv)
     if(argc<3){
       return printf("Usage : [train pgm] [test pgm]\n"),-1;
     }
+    
     pgm_t *train_images;
+
     //Loading images pre-processed, and training
 
     train_images = pgm_load(argv[1]);

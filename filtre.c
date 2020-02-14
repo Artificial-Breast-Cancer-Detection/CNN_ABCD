@@ -11,6 +11,7 @@ int main(int argc, char **argv)
                       "\t-sobel  : apply Sobel filter\n"
                       "\t-kirsch : apply Kirsch filter\n"
                       "\t-prewitt: apply Prewitt filter\n", argv[0]), -1;
+                      
 
     pgm_t *p_in  = pgm_load(argv[2]);
 
