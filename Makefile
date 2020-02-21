@@ -1,27 +1,19 @@
-CC=gcc
-CFLAGS=-o2
-LFLAGS=-lm
+CC = gcc
+CFLAGS = -o2
+LDFLAGS = -lm
 
-all:prog nn filtre
+all :prog
 
-prog: main.o nn.o
-	$(CC) $(CFLAGS) -o $@ $^	$(LFLAGS)	-lcmocka
+prog:	nn.o	main.o
+	$(CC)	$(CFLAGS)	-o $@ $^	-lcmocka	$(LDFLAGS)
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<	-lcmocka
+nn.o:	nn.c	protos.h
+	$(CC)	$(CFLAGS)	-c	-o	$@	$<	$(LDFLAGS)
 
-nn.o : protos.h
-main.o : protos.h
-
-filtre: filtre.o nn.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)	-lcmocka
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-filtre.o: protos.h
+main.o:	main.c
+	$(CC)	$(CFLAGS)	-c	-o	$@	$<
 
 clean:
-	rm -f *.o nn filtre
+	rm	-f	*.o	nn	main
 
-.PHONY: clean
+.PHONY:	clean
