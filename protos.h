@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <cmocka.h>
 #define max(a, b) ((a) > (b)) ? (a) : (b)
 
 #define INDEX(x, y, w) (((x) * (w)) + (y))
@@ -35,6 +34,10 @@ ppm_t *rgbengrayscale(ppm_t *train_images);
 
 u64 relu(u32 x);
 
+float d_sigmoid(float x);
+
+float sigmoidbis(float x);
+
 pgm_t *pgm_load(char *fname);
 
 void pgm_save(char *fname, pgm_t *p);
@@ -53,9 +56,9 @@ void ppm_save(char *fname, ppm_t *p);
 
 ppm_t *ppm_create(u64 h, u64 w, u64 t);
 
-void trainer(int nn, ppm_t *pp_train_images, ppm_t *test_image);
+void trainer(int nn, pgm_t *pp_train_images, pgm_t *test_image);
 
-void testing(float w[][100], int n_w, int n_h, ppm_t *pp_images, float *h);
+void testing(float w[][100], int n_w, int n_h, pgm_t *pp_images, float *h);
 
 void ppm_close(ppm_t *p);
 

@@ -3,7 +3,18 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <cmocka.h>
+
+//Fonction d_sigmoid
+inline float sigmoidbis(float x)
+{
+  return 1.0/(1.0 + exp(-x));
+}
+
+//sigmoid derivative
+float d_sigmoid(float x)
+{
+  return x*(1 - x);
+}
 
 /*Fonction pour convertir les imange en grayscale*/
 ppm_t *rgbengrayscale( ppm_t *train_images){
@@ -210,7 +221,7 @@ ppm_t *ppm_create(u64 h, u64 w, u64 t){
   return p;
 }
 
-void testing(float w[][100], int n_w, int n_h, ppm_t *pp_images, float *h){
+void testing(float w[][100], int n_w, int n_h, pgm_t *pp_images, float *h){
 
   float s, _s,l[100];
 
@@ -219,8 +230,8 @@ void testing(float w[][100], int n_w, int n_h, ppm_t *pp_images, float *h){
     s = 0.0;
 
     for(int j = 1; j <= n_w; j++){
-        s += pp_images->px[j] * w[j][i];
-        l[i] = relu(s);
+        s += pp_images->p[j] * w[j][i];
+        l[i] = sigmoidbis(s);
       }
   }
 
@@ -229,7 +240,7 @@ void testing(float w[][100], int n_w, int n_h, ppm_t *pp_images, float *h){
   for(int i = 1; i <= n_h; i++)
       s+= (l[i] * h[i]);
 
-    _s = relu(s);
+    _s = sigmoidbis(s);
 
     /*Sortie: Detection de cancer*/
     char *output1 = "Cancer not detected\n";
@@ -250,7 +261,7 @@ void testing(float w[][100], int n_w, int n_h, ppm_t *pp_images, float *h){
 }
 
 /*Fonction de train qui renvoie les poids du reseau*/
-void trainer(int nn, ppm_t *pp_train_images, ppm_t *test_image){
+void trainer(int nn, pgm_t *pp_train_images, pgm_t *test_image){
 
   int n_w = 2500, n_h = 100;
 
@@ -275,10 +286,10 @@ void trainer(int nn, ppm_t *pp_train_images, ppm_t *test_image){
         for(int i = 1; i <= n_h; i++){
           s = 0.0;
             for(int j = 1; j <= n_w; j++){
-              s += pp_train_images->px[j] * w0[j][i];
-
-              lw0[k][i] = relu(s);
+              s += pp_train_images->p[j] * w0[j][i];
             }
+
+              lw0[k][i] = sigmoidbis(s);
         }
     }
 
@@ -291,16 +302,17 @@ void trainer(int nn, ppm_t *pp_train_images, ppm_t *test_image){
 
         for(int k = 1; k<= n_h; k++){
           s += (lw0[j][k] * h[k]);
+        }
 
-        lh[j] = relu(s);
+        lh[j] = sigmoidbis(s);
         err += fabs(lh[j] -1);
-        lh_d[j] = (lh[j] -1) * relu(lh[j]);
+        lh_d[j] = (lh[j] -1) * d_sigmoid(lh[j]);
 
       }
       //forming lw_d
       for(int j = 1; j <= nn; j++){
         for(int k = 1; k<= n_h; k++){
-          lw_d[j][k] = lh_d[j] * h[k] *relu(lw0[j][k]);
+          lw_d[j][k] = lh_d[j] * h[k] *d_sigmoid(lw0[j][k]);
         }
       }
       //updating w0
@@ -309,9 +321,10 @@ void trainer(int nn, ppm_t *pp_train_images, ppm_t *test_image){
           s=0.0;
 
           for(int l = 1; l <= nn; l++){
-            s += (pp_train_images->px[l] * lw_d[l][k]);
-            w0[j][k] -= (alpha *s);
+            s += (pp_train_images->p[l] * lw_d[l][k]);
           }
+            w0[j][k] -= (alpha *s);
+
         }
       }
 
@@ -321,8 +334,9 @@ void trainer(int nn, ppm_t *pp_train_images, ppm_t *test_image){
 
         for(int k =1; k <= nn; k++){
           s += (lw0[k][j] * lh_d[k]);
-          h[j] -= (alpha * s);
         }
+          h[j] -= (alpha * s);
+
       }
 
       //
@@ -353,4 +367,4 @@ void trainer(int nn, ppm_t *pp_train_images, ppm_t *test_image){
       }
     }
   }
-}
+

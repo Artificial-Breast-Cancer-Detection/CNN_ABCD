@@ -4,7 +4,7 @@
 
 int main(int argc, char **argv) {
 
-pgm_t *p_in = pgm_load("image.pgm");
+pgm_t *p_in = pgm_load("tumeur.pgm");
 
     if(!p_in)
         return printf("Error: cannot open pgm file (%s)\n",argv[2] ), -2;
@@ -15,15 +15,15 @@ pgm_t *p_in = pgm_load("image.pgm");
 
   pgm_apply_sobel_filter(p_in->p, p_out->p, p_in->h, p_in->w, 100);
 
-  pgm_save("img.pgm", p_out);
+  pgm_save("tumeur.pgm", p_out);
 
-  ppm_t *train_images;
+  pgm_t *train_images;
 
-  train_images = ppm_open("img.pgm");
+  train_images = pgm_load("tumeur.pgm");
 
-  ppm_t *test_images;
+  pgm_t *test_images;
 
-  test_images = ppm_open("imag.ppm");
+  test_images = pgm_load("tumeur.pgm");
 
   trainer(1,train_images,test_images);
 
