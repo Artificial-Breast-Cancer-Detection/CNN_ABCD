@@ -35,10 +35,10 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
             w0[j][i]=(sqrt(-2.0*log((double)rand()/RAND_MAX)))*(cos(6.28318530718*(double)rand()/RAND_MAX));
 
 
-    for (int i = 1; i <= n_h; i++)
+    for (int i = 1; i <= n_h; i++){
         //h[i] = (2.0 * rand()) / RAND_MAX - 1;
         h[i]=(sqrt(-2.0*log((double)rand()/RAND_MAX)))*(cos(6.28318530718*(double)rand()/RAND_MAX));
-
+    }
     lbl2:
     //forming lw0
     for(int k=1;k<=nn;k++){
@@ -58,8 +58,9 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
         for (int j = 1; j <= nn; j++) {
             s = 0.0;
 
-            for (int k = 1; k <= n_h; k++)
+            for (int k = 1; k <= n_h; k++){
                 s += (lw0[j][k] * h[k]);
+            }
 
             lh[j] = sigmoidbis(s);
             err += fabs(lh[j] - 1);
@@ -78,8 +79,9 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
             for (int k = 1; k <= n_h; k++) {
                 s = 0.0;
 
-                for (int l = 1; l <= nn; l++)
+                for (int l = 1; l <= nn; l++){
                     s += (pp_train_images->px[l] * lw_d[l][k]);
+                }
 
                 w0[j][k] -= (alpha * s);  
             }
@@ -89,8 +91,9 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
         for (int j = 1; j <= n_h; j++) {
             s = 0.0;
 
-            for (int k = 1; k <= nn; k++)
+            for (int k = 1; k <= nn; k++){
                 s += (lw0[k][j] * lh_d[k]);
+            }
 
             h[j] -= (alpha * s);
         } 
