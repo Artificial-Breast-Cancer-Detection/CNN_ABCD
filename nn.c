@@ -17,16 +17,16 @@ float d_sigmoid(float x)
 }
 
 /*Fonction pour convertir les imange en grayscale*/
-ppm_t *rgbengrayscale( ppm_t *train_images){
+pgm_t *rgbengrayscale( pgm_t *train_images){
 
   for(int i=0; i < train_images->w * train_images->h * 3; i +=3)
     {
 
-      byte gray = train_images->px[i+2];
+      byte gray = train_images->p[i+2];
 
-      train_images->px[i]     = gray;
-      train_images->px[i + 1] = gray;
-      train_images->px[i + 2] = gray;
+      train_images->p[i]     = gray;
+      train_images->p[i + 1] = gray;
+      train_images->p[i + 2] = gray;
   }
   return train_images;
 }
@@ -40,25 +40,30 @@ inline u64 relu(u32 x){
 /*Fonction pour ouvrir les images sous format pgm*/
 pgm_t *pgm_load(char *fname){
   char c1, c2;
+  int N_images;
   pgm_t *p = NULL;
-  FILE *fd = fopen(fname, "rb");
+  for(int i = 0; i < N_images; i++)
+  {
+    FILE *fd = fopen(fname, "rb");
 
-  if(fd){
+    if(fd){
 
-    p = malloc(sizeof(pgm_t));
+      p = malloc(sizeof(pgm_t));
 
-    fscanf(fd, "%c%c", &c1, &c2);
+      fscanf(fd, "%c%c", &c1, &c2);
 
-    fscanf(fd, "%llu %llu\n", &p->w, &p->h);
+      fscanf(fd, "%llu %llu\n", &p->w, &p->h);
 
-    fscanf(fd,"%llu\n", &p->t);
+      fscanf(fd,"%llu\n", &p->t);
 
-    p->p = malloc(sizeof(byte) * p->h * p->w);
+      p->p = malloc(sizeof(byte) * p->h * p->w);
 
-    fread(p->p, sizeof(byte), p->h *p->w, fd);
+      fread(p->p, sizeof(byte), p->h *p->w, fd);
 
-    fclose(fd);
+      fclose(fd);
+    }
   }
+
   return p;
 }
 
@@ -137,88 +142,6 @@ void pgm_apply_sobel_filter(byte *img_in, byte *img_out, u64 h, u64 w, float thr
 
       img_out[INDEX(i, j, w)] = (mag > threshold) ? 255 : mag;
     }
-}
-
-/*Fonction pour enregistre l'image en ppm*/
-ppm_t *ppm_open(char *fname){
-
-  char c0, c1, c;
-  FILE *fd = fopen(fname, "rb");
-
-  if(fd){
-    ppm_t *p = malloc(sizeof(ppm_t));
-
-    fscanf(fd,"%c%c\n", &c0, &c1);
-
-    c = fgetc(fd);
-
-    if(c == '#'){
-
-      while(c != '\n')
-          c = fgetc(fd);
-    }
-    else
-        fseek(fd, -1, SEEK_CUR);
-
-    fscanf(fd, "%d %d\n", &p->w, &p->h);
-    fscanf(fd, "%d\n", &p->t);
-
-    p->px = malloc(sizeof(byte) * p->w * p->h * 3);
-
-    if((c0 == 'p') & (c1 == '6'))
-          {
-            fread(p->px, sizeof(byte), p->w * p->h *3, fd);
-          }
-    else
-        if((c0 == 'P') & (c1 == '3'))
-      {
-      }
-
-      fclose(fd);
-
-      return p;
-  }
-  else
-      return NULL;
-}
-
-/*Fonction sauvegarder les images en ppm*/
-void ppm_save(char *fname, ppm_t *p){
-
-  FILE * fd = fopen(fname, "wb");
-
-  fprintf(fd, "P6\n");
-  fprintf(fd, "%d %d\n", p->w, p->h);
-  fprintf(fd, "%d\n", 255);
-
-  fwrite(p->px, sizeof(byte), p->w * 3 * p->h, fd);
-
-  fclose(fd);
-}
-
-//
-void ppm_close(ppm_t *p){
-
-  if(p){
-
-    if(p->px)
-      free(p->px);
-
-    free(p);
-  }
-}
-/*Fonction pour créer une image ppm des sortie*/
-ppm_t *ppm_create(u64 h, u64 w, u64 t){
-
-  ppm_t *p = malloc(sizeof(ppm_t));
-
-  p->h = h;
-  p->w = w;
-  p->t = t;
-
-  p->px = malloc(sizeof(byte) * w *h);
-
-  return p;
 }
 
 void testing(float w[][100], int n_w, int n_h, pgm_t *pp_images, float *h){
@@ -368,3 +291,9 @@ void trainer(int nn, pgm_t *pp_train_images, pgm_t *test_image){
     }
   }
 
+  /*Save the result of training*/
+
+void save()
+{
+
+}
