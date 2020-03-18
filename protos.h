@@ -11,13 +11,6 @@ typedef unsigned u32;
 typedef unsigned char byte;
 typedef unsigned long long u64;
 
-typedef struct ppm_s{
-  int w;
-  int h;
-  int t;
-  byte *px;
-}ppm_t;
-
 typedef struct pgm_s{
   u64 w;
   u64 h;
@@ -30,7 +23,7 @@ typedef struct pair{
   float b[100][100];
 }pair;
 
-ppm_t *rgbengrayscale(ppm_t *train_images);
+pgm_t *rgbengrayscale(pgm_t *train_images);
 
 u64 relu(u32 x);
 
@@ -50,16 +43,9 @@ void pgm_apply_sobel_filter(byte *img_in, byte *img_out, u64 h, u64 w, float thr
 
 void pgm_close(pgm_t *p);
 
-ppm_t *ppm_open(char *fname);
-
-void ppm_save(char *fname, ppm_t *p);
-
-ppm_t *ppm_create(u64 h, u64 w, u64 t);
-
 void trainer(int nn, pgm_t *pp_train_images, pgm_t *test_image);
 
 void testing(float w[][100], int n_w, int n_h, pgm_t *pp_images, float *h);
 
-void ppm_close(ppm_t *p);
 
 #endif
