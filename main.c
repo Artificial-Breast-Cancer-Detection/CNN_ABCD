@@ -1,13 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "protos.h"
+#include "elmtNumber.h"
+
 
 int main(int argc, char **argv) {
+  size_t count;
+  int N_images = elmtNumber(count);
 
-pgm_t *p_in = pgm_load("tumeur.pgm");
+  printf("%d\n",N_images );
+
+  pgm_t *p_in = pgm_load(argv[1]);
 
     if(!p_in)
-        return printf("Error: cannot open pgm file (%s)\n",argv[2] ), -2;
+      return printf("Error: cannot open pgm file (%s)\n",argv[2] ), -2;
+
 
   pgm_t *p_out = pgm_create(p_in->h, p_in->w, p_in->t);
 
@@ -15,15 +23,15 @@ pgm_t *p_in = pgm_load("tumeur.pgm");
 
   pgm_apply_sobel_filter(p_in->p, p_out->p, p_in->h, p_in->w, 100);
 
-  pgm_save("tumeur.pgm", p_out);
+  pgm_save(argv[2], p_out);
 
   pgm_t *train_images;
 
-  train_images = pgm_load("tumeur.pgm");
+  train_images = pgm_load(argv[2]);
 
   pgm_t *test_images;
 
-  test_images = pgm_load("tumeur.pgm");
+  test_images = pgm_load(argv[3]);
 
   trainer(1,train_images,test_images);
 
