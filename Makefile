@@ -10,7 +10,7 @@ prog:	nn.o	main.o
 nn.o:	nn.c	protos.h
 	$(CC)	$(CFLAGS)	-c	-o	$@	$<	$(LDFLAGS)
 
-main.o:	main.c	elmtNumber.h
+main.o:	main.c
 	$(CC)	$(CFLAGS)	-c	-o	$@	$<
 
 clean:
