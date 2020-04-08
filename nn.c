@@ -158,7 +158,7 @@ void testing(float w[][100],int n_w,int n_h,ppm_t *pp_images,float *h) {
     char *output2 = "Cancer detected\n";
     
     printf("\nProbabilite: (%lf) %.0lf \n\nPress enter to continue ...", _s, nearbyint(_s));
-    if(nearbyint(_s) > 0.7){
+    if(nearbyint(_s) == 1){
       printf("result : %s\n",output1);
     }else{
       printf("result : %s\n",output2);
