@@ -3,6 +3,11 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
 #include <cmocka.h>
 
 //Fonction d_sigmoid
@@ -306,4 +311,37 @@ void trainer(int nn, ppm_t *pp_train_images){
 
     }
   }
+}
+
+/*fonction pour lire les nom des images*/
+void read_data_name(char *path){
+
+  size_t count = 0;
+  struct dirent *res;
+  struct stat sb;
+
+  if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode)){
+      DIR *folder = opendir ( path );
+
+      if (access ( path, F_OK ) != -1 ){
+          if ( folder ){
+              while ( ( res = readdir ( folder ) ) ){
+                  if ( strcmp( res->d_name, "." ) && strcmp( res->d_name, ".." ) ){
+                      printf("fname[%zu] =\"%s\"\n", count + 1, res->d_name);
+                      count++;
+                  }
+              }
+
+              closedir ( folder );
+          }else{
+              perror ( "Could not open the directory" );
+              exit( EXIT_FAILURE);
+          }
+      }
+
+  }else{
+      printf("The %s it cannot be opened or is not a directory\n", path);
+      exit( EXIT_FAILURE);
+  }
+
 }
