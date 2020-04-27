@@ -14,6 +14,6 @@ main.o:	main.c
 	$(CC)	$(CFLAGS)	-c	-o	$@	$<
 
 clean:
-	rm	-f	*.o	nn	main
+	rm	-f	*.o
 
 .PHONY:	clean
