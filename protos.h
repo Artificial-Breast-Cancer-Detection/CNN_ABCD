@@ -34,8 +34,6 @@ ppm_t *rgbengrayscale(ppm_t *train_images);
 
 ppm_t *ppm_create(u64 h, u64 w, u64 t);
 
-void ppm_save(char *fname, ppm_t *p);
-
 int convolve(byte *m, u64 mh, u64 mw, int *f, u64 fh, u64 fw);
 
 void ppm_apply_sobel_filter(byte *img_in, byte *img_out, u64 h, u64 w, float threshold);
