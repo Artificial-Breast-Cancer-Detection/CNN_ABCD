@@ -2,7 +2,8 @@ CFLAGS=-std=c99 -Wall
 DFLAGS=-g3
 LFLAGS=-lm
 
-all: nn filtre
+NN_FLIST=nn.c 
+all: nn filtre O2
 
 nn: main.o nn.o
 	$(CC) $(CFLAGS) $(DFLAGS) -o $@ $^ $(LFLAGS)
@@ -21,7 +22,10 @@ filtre: filtre.o nn.o
 
 filtre.o: protos.h
 
+O2:
+	$(CC) $(CFLAGS) $(DFLAGS) -$@ $(NN_FLIST) main.c -o nn_$@ $(LFLAGS)
+
 clean:
-	rm -f *.o nn filtre
+	rm -f *.o nn filtre nn_O2
 
 .PHONY: clean

@@ -1,6 +1,7 @@
 #include "protos.h"
 #include <math.h>
 #include <time.h>
+#include <string.h>
 
 //Sigmoid derivative
 float d_sigmoid(float x)
@@ -18,9 +19,17 @@ inline float sigmoidbis(float x)
 void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
     
     //Layer inputs : n_w and hidden layer n_h
-    int n_w = 2500,n_h = 100;
+    pp_train_images->n_w = 1000;
+    pp_train_images->n_h = 1000;
+    (*pp_train_images->w0) =(float*) malloc(sizeof(float)*pp_train_images->n_h);
     //weights
-    float lw0[2500][100],w0[100][100],lh[100],h[100],lh_d[100],lw_d[2500][100];
+    for(int a=0;a<pp_train_images->n_w;a++){
+        (*pp_train_images->w0)[a] = 0.;
+    }
+    
+    float lw0[pp_train_images->n_w][pp_train_images->n_h],
+    lh[pp_train_images->n_h],h[pp_train_images->n_h],lh_d[pp_train_images->n_h],
+    lw_d[pp_train_images->n_w][pp_train_images->n_h];
     //sigmoid error and learning rate
     float s ,err ,alpha = 1.0;
     int retrains = 0;
@@ -29,23 +38,22 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
     lbl1:
 
     //Init
-    for (int i = 1; i <= n_w; i++)
-        for (int j = 1; j <= n_h; j++)
-            //w[i][j] = (2.0 * rand())/ RAND_MAX - 1;
-            w0[j][i]=(sqrt(-2.0*log((double)rand()/RAND_MAX)))*(cos(6.28318530718*(double)rand()/RAND_MAX));
+    for (int i = 0; i < pp_train_images->n_w; i++)
+        //w[i][j] = (2.0 * rand())/ RAND_MAX - 1;
+        (*pp_train_images->w0)[i]=(sqrt(-2.0*log((double)rand()/RAND_MAX)))*(cos(6.28318530718*(double)rand()/RAND_MAX));
 
 
-    for (int i = 1; i <= n_h; i++){
+    for (int i = 0; i < pp_train_images->n_h; i++){
         //h[i] = (2.0 * rand()) / RAND_MAX - 1;
         h[i]=(sqrt(-2.0*log((double)rand()/RAND_MAX)))*(cos(6.28318530718*(double)rand()/RAND_MAX));
     }
     lbl2:
     //forming lw0
-    for(int k=1;k<=nn;k++){
-        for (int i = 1; i <= n_h; i++){
+    for(int k=0;k<nn;k++){
+        for (int i = 0; i < pp_train_images->n_h; i++){
             s = 0.0;
-            for (int j = 1; j <= n_w; j++){
-                s += pp_train_images->px[j] * w0[j][i];
+            for (int j = 0; j < pp_train_images->n_w; j++){
+                s += pp_train_images->px[j] * (*pp_train_images->w0)[i];
 
                 lw0[k][i] = sigmoidbis(s);
             }
@@ -55,10 +63,10 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
 
     for(int i=0;;i++) {
         //forming lh_d
-        for (int j = 1; j <= nn; j++) {
+        for (int j = 0; j < nn; j++) {
             s = 0.0;
 
-            for (int k = 1; k <= n_h; k++){
+            for (int k = 0; k < pp_train_images->n_h; k++){
                 s += (lw0[j][k] * h[k]);
             }
 
@@ -68,30 +76,30 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
         }
 
         //Forming lw_d
-        for (int j = 1; j <= nn; j++) {
-            for (int k = 1; k <= n_h; k++) {
+        for (int j = 0; j < nn; j++) {
+            for (int k = 0; k < pp_train_images->n_h; k++) {
                 lw_d[j][k] = lh_d[j] * h[k] * d_sigmoid(lw0[j][k]);
             }
         }
 
         //Updating w0
-        for (int j = 1; j < n_w; j++) {
-            for (int k = 1; k <= n_h; k++) {
+        for (int j = 0; j < pp_train_images->n_w; j++) {
+            for (int k = 0; k < pp_train_images->n_h; k++) {
                 s = 0.0;
 
-                for (int l = 1; l <= nn; l++){
-                    s += (pp_train_images->px[l] * lw_d[l][k]);
+                for (int l = 0; l < nn; l++){
+                    s += ((float)pp_train_images->px[l] * lw_d[l][k]);
                 }
 
-                w0[j][k] -= (alpha * s);  
+                (*pp_train_images->w0)[k] -= (alpha * s);  
             }
         }
 
         //Updating h
-        for (int j = 1; j <= n_h; j++) {
+        for (int j = 0; j < pp_train_images->n_h; j++) {
             s = 0.0;
 
-            for (int k = 1; k <= nn; k++){
+            for (int k = 0; k < nn; k++){
                 s += (lw0[k][j] * lh_d[k]);
             }
 
@@ -126,29 +134,30 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
                 goto lbl2;
             else
               if (mode == '2')
-                testing(w0,n_w,n_h,test_image,h);
+                testing(test_image,h);
         }
     }
     
 }
 
-void testing(float w[][100],int n_w,int n_h,ppm_t *pp_images,float *h) {
+void testing(ppm_t *pp_images,float *h) {
 
-    float s, _s,l[100];
+    float s, _s,l[pp_images->n_h];
+    FILE *poids = fopen("./data.txt","w");
 
-    for (int i = 1; i <= n_h; i++)
+    for (int i = 0; i < pp_images->n_h; i++)
     {
         s = 0.0;
 
-        for (int j = 1; j <= n_w; j++)
-            s += pp_images->px[j] * w[j][i];
+        for (int j = 0; j < pp_images->n_w; j++)
+            s += (float)pp_images->px[j] * (*pp_images->w0)[i];
 
         l[i] = sigmoidbis(s);
     }
 
     s = 0.0;
 
-    for (int i = 1; i <= n_h; i++)
+    for (int i = 0; i < pp_images->n_h; i++)
         s += (l[i] * h[i]);
 
     _s = sigmoidbis(s);
@@ -160,6 +169,22 @@ void testing(float w[][100],int n_w,int n_h,ppm_t *pp_images,float *h) {
     printf("\nProbabilite: (%lf) %.0lf \n\nPress enter to continue ...", _s, nearbyint(_s));
     if(nearbyint(_s) == 1){
       printf("result : %s\n",output1);
+      if(!poids){
+          perror("fopen");
+          exit(EXIT_FAILURE);
+      }else
+      { 
+        for(int j=0;j<pp_images->n_h;j++){
+            int ret = fprintf(poids,"%lf \n",h[j]);
+        }
+        int tmp = fprintf(poids,"%s ","\n");
+        for(int j=0;j<pp_images->n_w;j++){
+            int weights = fprintf(poids,"%lf \n",(*pp_images->w0)[j]);
+        }
+        printf("\n");
+      }
+      fclose(poids);
+      
     }else{
       printf("result : %s\n",output2);
     }

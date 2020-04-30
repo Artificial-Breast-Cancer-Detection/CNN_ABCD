@@ -15,7 +15,11 @@ typedef struct ppm_s {
   int w; //Width
   int h; //Height 
   int t; //Threshold
-  byte *px; }ppm_t;
+  int n_w; // nombre de layers d'entrée
+  int n_h; // nombre de hidden layer
+  byte *px; 
+  float *(w0)[]; // entry weights
+  }ppm_t;
 
 typedef struct pgm_s{
     u64 w;
@@ -23,11 +27,6 @@ typedef struct pgm_s{
     u64 t;
     byte *p;
 }pgm_t;
-
-typedef struct pair {
-float a[100];
-float b[100][100];
-} pair;
 
 ppm_t *rgbengrayscale(ppm_t *train_images);
 
@@ -61,7 +60,7 @@ void ppm_close(ppm_t *p);
 
 ppm_t *ppm_create(u64 h, u64 w, u64 t);
 
-void testing(float w[][100],int n_w,int n_h,ppm_t *pp_images,float *h);
+void testing(ppm_t *pp_images,float *h);
 
 void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image);
 
