@@ -168,29 +168,88 @@ void testing(ppm_t *pp_images,float *h) {
     
     printf("\nProbabilite: (%lf) %.0lf \n\nPress enter to continue ...", _s, nearbyint(_s));
     if(nearbyint(_s) == 1){
-      printf("result : %s\n",output1);
+      printf("result : %s\n",output2);
       if(!poids){
           perror("fopen");
           exit(EXIT_FAILURE);
       }else
       { 
-        for(int j=0;j<pp_images->n_h;j++){
-            int ret = fprintf(poids,"%lf \n",h[j]);
-        }
-        int tmp = fprintf(poids,"%s ","\n");
         for(int j=0;j<pp_images->n_w;j++){
             int weights = fprintf(poids,"%lf \n",(*pp_images->w0)[j]);
+        }
+        int tmp = fprintf(poids,"%s ","\n");
+        for(int j=0;j<pp_images->n_h;j++){
+            int ret = fprintf(poids,"%lf \n",h[j]);
         }
         printf("\n");
       }
       fclose(poids);
       
     }else{
-      printf("result : %s\n",output2);
+      printf("result : %s\n",output1);
     }
+    free(*pp_images->w0);
 
     getchar();
     getchar();
+}
+
+void data_test(char *fname, ppm_t *pp_images){
+    FILE *entry = fopen(fname,"r");
+    char donnees[MAX] = {0};
+    pp_images->n_h = 1000;
+    pp_images->n_w = 1000;
+    float s, _s,l[pp_images->n_h];
+    printf("Le fichier à ouvrir est : %s\n", fname);
+    
+    if(entry != NULL){
+        printf("L'ouverture du fichier %s a reussi !\n", fname);
+    }
+ 
+    for (int i = 0; i < pp_images->n_h; i++)
+    {
+        s = 0.0;
+        fgets(donnees, MAX, entry);
+        //printf("%s ",donnees);
+
+        for (int j = 0; j < pp_images->n_w; j++){
+            s += (float)pp_images->px[j] * atof(donnees);
+        }
+
+        l[i] = sigmoidbis(s);
+    }
+
+    s = 0.0;
+    // tableau des weights des hidden layers
+    float tab_last[pp_images->n_h];
+    memset(tab_last,0,sizeof(float)*pp_images->n_h);
+    int tmp=0;
+    for(int iter=pp_images->n_h+2;iter<=2*pp_images->n_h+2;iter++){
+        fgets(donnees,MAX,entry);
+        tab_last[tmp] = atof(donnees);
+        tmp++;
+    }
+
+    float accu = 0;
+    for (int i = 0; i <= pp_images->n_h; i++){
+        //printf("%f \n",tab_last[i]);
+        accu += (l[i] * tab_last[i]);
+        s += accu;
+    }
+
+    _s = sigmoidbis(s);
+
+    //output : cancer detection
+    char *output1 = "Cancer not detected\n";
+    char *output2 = "Cancer detected\n";
+    
+    printf("\nProbabilite: (%lf) %.0lf \n\nPress enter to continue ...", _s, nearbyint(_s));
+    if(nearbyint(_s) == 1){
+        printf("result : %s\n",output2);
+    }else{
+        printf("result : %s\n",output1);
+    }
+
 }
 
 // fonction pour convertir les images en grayscale

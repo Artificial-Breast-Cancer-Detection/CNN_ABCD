@@ -9,7 +9,7 @@ nn: main.o nn.o
 	$(CC) $(CFLAGS) $(DFLAGS) -o $@ $^ $(LFLAGS)
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(DFLAGS) -c -o $@ $< $(LFLAGS)
+	$(CC) $(CFLAGS) $(DFLAGS) -c -o $@ $< $(LFLAGS) -g
 
 nn.o : protos.h
 main.o : protos.h
