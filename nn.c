@@ -188,9 +188,8 @@ void testing(ppm_t *pp_images,float *h) {
     }else{
       printf("result : %s\n",output1);
     }
-    free(*pp_images->w0);
+    //free(*pp_images->w0);
 
-    getchar();
     getchar();
 }
 
