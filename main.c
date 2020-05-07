@@ -29,8 +29,8 @@ int main(int argc, char **argv)
       snprintf(buf,512,"%s%s",path,list[i]->d_name);
       train_images = ppm_open(buf);
       printf("Resolution: %u Pixels, %u MPixels\n", (train_images->h * train_images->w), (train_images->h * train_images->w) / 1000000);
-      //trainer(1,train_images,train_images);
-      data_test("./data.txt",train_images);
+      trainer(1,train_images);
+      //data_test("./data.txt",train_images);
     }
     
     

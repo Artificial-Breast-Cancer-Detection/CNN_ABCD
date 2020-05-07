@@ -64,7 +64,7 @@ ppm_t *ppm_create(u64 h, u64 w, u64 t);
 
 void testing(ppm_t *pp_images,float *h);
 
-void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image);
+void trainer(int nn, ppm_t *pp_train_images);
 
 // test des résultats enregistrés dans data.txt
 void data_test(char *fname,ppm_t *pp_images);

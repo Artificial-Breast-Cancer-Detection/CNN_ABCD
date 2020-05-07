@@ -16,12 +16,12 @@ inline float sigmoidbis(float x)
 }
 
 //fonction de train qui renvoie les poids du réseau
-void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
+void trainer(int nn, ppm_t *pp_train_images){
     
     //Layer inputs : n_w and hidden layer n_h
-    pp_train_images->n_w = 1000;
-    pp_train_images->n_h = 1000;
-    (*pp_train_images->w0) =(float*) malloc(sizeof(float)*pp_train_images->n_h);
+    pp_train_images->n_w = 2500;
+    pp_train_images->n_h = 100;
+    (*pp_train_images->w0) =(float*) malloc(sizeof(float)*pp_train_images->h*pp_train_images->w);
     //weights
     for(int a=0;a<pp_train_images->n_w;a++){
         (*pp_train_images->w0)[a] = 0.;
@@ -65,9 +65,11 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
         //forming lh_d
         for (int j = 0; j < nn; j++) {
             s = 0.0;
+            float inc = 0.;
 
             for (int k = 0; k < pp_train_images->n_h; k++){
-                s += (lw0[j][k] * h[k]);
+                inc += (lw0[j][k] * h[k]);
+                s += inc;
             }
 
             lh[j] = sigmoidbis(s);
@@ -86,9 +88,11 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
         for (int j = 0; j < pp_train_images->n_w; j++) {
             for (int k = 0; k < pp_train_images->n_h; k++) {
                 s = 0.0;
+                float acc = 0.;
 
                 for (int l = 0; l < nn; l++){
-                    s += ((float)pp_train_images->px[l] * lw_d[l][k]);
+                    acc += ((float)pp_train_images->px[l] * lw_d[l][k]);
+                    s += acc;
                 }
 
                 (*pp_train_images->w0)[k] -= (alpha * s);  
@@ -98,9 +102,11 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
         //Updating h
         for (int j = 0; j < pp_train_images->n_h; j++) {
             s = 0.0;
+            float accu = 0.;
 
             for (int k = 0; k < nn; k++){
-                s += (lw0[k][j] * lh_d[k]);
+                accu += (lw0[k][j] * lh_d[k]);
+                s += accu;
             }
 
             h[j] -= (alpha * s);
@@ -122,6 +128,7 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
 
             //Mean absolute error
             printf("retrains: %d, err: %lf\n", retrains, err_n);
+            getchar();
 
             //getchar();
             printf("Retrain (0), Keep training (1), or test (2): ");
@@ -134,7 +141,8 @@ void trainer(int nn, ppm_t *pp_train_images,ppm_t *test_image){
                 goto lbl2;
             else
               if (mode == '2')
-                testing(test_image,h);
+                testing(pp_train_images,h);
+                break;
         }
     }
     
@@ -156,9 +164,13 @@ void testing(ppm_t *pp_images,float *h) {
     }
 
     s = 0.0;
+    float accu = 0.;
 
-    for (int i = 0; i < pp_images->n_h; i++)
-        s += (l[i] * h[i]);
+    for (int i = 0; i < pp_images->n_h; i++){
+        accu += (l[i] * h[i]);
+        s += accu;
+    }
+    //printf("s = %f \n",s);
 
     _s = sigmoidbis(s);
 
@@ -166,7 +178,7 @@ void testing(ppm_t *pp_images,float *h) {
     char *output1 = "Cancer not detected\n";
     char *output2 = "Cancer detected\n";
     
-    printf("\nProbabilite: (%lf) %.0lf \n\nPress enter to continue ...", _s, nearbyint(_s));
+    printf("\nProbabilite: (%lf) %.0lf \n", _s, nearbyint(_s));
     if(nearbyint(_s) == 1){
       printf("result : %s\n",output2);
       if(!poids){
@@ -189,8 +201,6 @@ void testing(ppm_t *pp_images,float *h) {
       printf("result : %s\n",output1);
     }
     //free(*pp_images->w0);
-
-    getchar();
 }
 
 void data_test(char *fname, ppm_t *pp_images){
@@ -229,7 +239,7 @@ void data_test(char *fname, ppm_t *pp_images){
         tmp++;
     }
 
-    float accu = 0;
+    float accu = 0.;
     for (int i = 0; i <= pp_images->n_h; i++){
         //printf("%f \n",tab_last[i]);
         accu += (l[i] * tab_last[i]);
