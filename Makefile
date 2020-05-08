@@ -9,13 +9,13 @@ NN_FLIST=nn.c
 all: nn filtre O2 mkl
 
 nn: main.o nn.o
-	$(CC) $(CFLAGS) $(DFLAGS) -o $@ $^ $(LFLAGS)
+	$(CC) $(CFLAGS) $(DFLAGS) -o $@ $^ $(LFLAGS) -g
 
 mkl: main.o nn.o
 	$(ICC) $(CFLAGS) main.c $(NN_FLIST) -o nn_bench_$@ $(IFLAGS)
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(DFLAGS) -c -o $@ $< $(LFLAGS) -g
+	$(CC) $(CFLAGS) $(DFLAGS) -c -o $@ $< $(LFLAGS) 
 
 nn.o : protos.h
 main.o : protos.h

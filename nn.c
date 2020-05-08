@@ -1,5 +1,5 @@
 #include "protos.h"
-#include <math.h>
+#include <omp.h>
 #include <time.h>
 #include <string.h>
 
@@ -19,9 +19,9 @@ inline float sigmoidbis(float x)
 void trainer(int nn, ppm_t *pp_train_images){
     
     //Layer inputs : n_w and hidden layer n_h
-    pp_train_images->n_w = 2500;
-    pp_train_images->n_h = 100;
-    (*pp_train_images->w0) =(float*) malloc(sizeof(float)*pp_train_images->h*pp_train_images->w);
+    pp_train_images->n_w = 1000;
+    pp_train_images->n_h = 1000;
+    (*pp_train_images->w0) =(float*) malloc(sizeof(float)*pp_train_images->n_w);
     //weights
     for(int a=0;a<pp_train_images->n_w;a++){
         (*pp_train_images->w0)[a] = 0.;
@@ -53,19 +53,19 @@ void trainer(int nn, ppm_t *pp_train_images){
         for (int i = 0; i < pp_train_images->n_h; i++){
             s = 0.0;
             for (int j = 0; j < pp_train_images->n_w; j++){
-                s += pp_train_images->px[j] * (*pp_train_images->w0)[i];
+                s += (float)pp_train_images->px[j] * (*pp_train_images->w0)[i];
 
                 lw0[k][i] = sigmoidbis(s);
             }
         }
     }
     err = 0.;
+    float inc = 0.;
 
     for(int i=0;;i++) {
         //forming lh_d
         for (int j = 0; j < nn; j++) {
             s = 0.0;
-            float inc = 0.;
 
             for (int k = 0; k < pp_train_images->n_h; k++){
                 inc += (lw0[j][k] * h[k]);
@@ -85,10 +85,10 @@ void trainer(int nn, ppm_t *pp_train_images){
         }
 
         //Updating w0
+        float acc = 0.;
         for (int j = 0; j < pp_train_images->n_w; j++) {
             for (int k = 0; k < pp_train_images->n_h; k++) {
                 s = 0.0;
-                float acc = 0.;
 
                 for (int l = 0; l < nn; l++){
                     acc += ((float)pp_train_images->px[l] * lw_d[l][k]);
@@ -100,9 +100,9 @@ void trainer(int nn, ppm_t *pp_train_images){
         }
 
         //Updating h
+        float accu = 0.;
         for (int j = 0; j < pp_train_images->n_h; j++) {
             s = 0.0;
-            float accu = 0.;
 
             for (int k = 0; k < nn; k++){
                 accu += (lw0[k][j] * lh_d[k]);
@@ -130,7 +130,6 @@ void trainer(int nn, ppm_t *pp_train_images){
             printf("retrains: %d, err: %lf\n", retrains, err_n);
             getchar();
 
-            //getchar();
             printf("Retrain (0), Keep training (1), or test (2): ");
             mode = getchar();
 
@@ -140,12 +139,24 @@ void trainer(int nn, ppm_t *pp_train_images){
             if (mode == '1')
                 goto lbl2;
             else
-              if (mode == '2')
+              if (mode == '2'){
                 testing(pp_train_images,h);
                 break;
+              }
         }
     }
     
+}
+
+// fonction qui stocke le résultat et le renvoie
+const char *output_test_char(const char * res,ppm_t *pp_images) {
+    pp_images->result = res;
+    return res;
+}
+
+// fonction pour récupérer le résultat afin de faire la comparaison avec le output
+const char* get_res(ppm_t *pp_images){
+    return pp_images->result;
 }
 
 void testing(ppm_t *pp_images,float *h) {
@@ -181,6 +192,7 @@ void testing(ppm_t *pp_images,float *h) {
     printf("\nProbabilite: (%lf) %.0lf \n", _s, nearbyint(_s));
     if(nearbyint(_s) == 1){
       printf("result : %s\n",output2);
+      output_test_char(output2,pp_images);
       if(!poids){
           perror("fopen");
           exit(EXIT_FAILURE);
@@ -199,8 +211,8 @@ void testing(ppm_t *pp_images,float *h) {
       
     }else{
       printf("result : %s\n",output1);
+      output_test_char(output1,pp_images);
     }
-    //free(*pp_images->w0);
 }
 
 void data_test(char *fname, ppm_t *pp_images){

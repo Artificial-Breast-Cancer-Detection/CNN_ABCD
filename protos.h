@@ -19,6 +19,7 @@ typedef struct ppm_s {
   int t; //Threshold
   int n_w; // nombre de layers d'entrée
   int n_h; // nombre de hidden layer
+  const char *result;
   byte *px; 
   float *(w0)[]; // entry weights
   }ppm_t;
@@ -68,5 +69,9 @@ void trainer(int nn, ppm_t *pp_train_images);
 
 // test des résultats enregistrés dans data.txt
 void data_test(char *fname,ppm_t *pp_images);
+
+const char *output_test_char(const char * res,ppm_t *pp_images);
+
+const char* get_res(ppm_t *pp_images);
 
 #endif
