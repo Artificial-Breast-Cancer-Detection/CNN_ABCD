@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <omp.h>
 #define max(a, b) ((a) > (b)) ? (a) : (b)
 //2D access in a 1D array
 #define INDEX(x, y, w) (((x) * (w)) + (y))

@@ -12,6 +12,7 @@ int main(int argc, char **argv)
     if(argc<2){
       return printf("Usage : [train ppm] \n"),-1;
     }
+    omp_set_num_threads(4);
 
     char* current_test_char = "Cancer not detected\n";
     int bad_test_classifications = 0,total_test_classifications=0;
@@ -24,7 +25,8 @@ int main(int argc, char **argv)
       perror("scandir");
       return 1;
     }
-    ppm_t *train_images;
+    
+    ppm_t *train_images = (ppm_t*)malloc(sizeof(ppm_t));
     //Loading images pre-processed, and training
 
     for(int i=2;i<nb_files;i++){
@@ -39,6 +41,7 @@ int main(int argc, char **argv)
       }
 
         total_test_classifications++;
+        ppm_close(train_images);
     }
     //Percentage of bad test classifications
     printf("bad test classifications %d\n", bad_test_classifications );

@@ -1,5 +1,4 @@
 #include "protos.h"
-#include <omp.h>
 #include <time.h>
 #include <string.h>
 
@@ -19,17 +18,19 @@ inline float sigmoidbis(float x)
 void trainer(int nn, ppm_t *pp_train_images){
     
     //Layer inputs : n_w and hidden layer n_h
-    pp_train_images->n_w = 1000;
-    pp_train_images->n_h = 1000;
+    pp_train_images->n_w = 2500;
+    pp_train_images->n_h = 2500;
     (*pp_train_images->w0) =(float*) malloc(sizeof(float)*pp_train_images->n_w);
     //weights
     for(int a=0;a<pp_train_images->n_w;a++){
         (*pp_train_images->w0)[a] = 0.;
     }
     
-    float lw0[pp_train_images->n_w][pp_train_images->n_h],
-    lh[pp_train_images->n_h],h[pp_train_images->n_h],lh_d[pp_train_images->n_h],
-    lw_d[pp_train_images->n_w][pp_train_images->n_h];
+    float *lw0 = (float*) malloc(pp_train_images->n_h*sizeof(float));
+    memset(lw0,0,sizeof(float)*pp_train_images->n_h);
+    float lh[pp_train_images->n_h],h[pp_train_images->n_h],lh_d[pp_train_images->n_h];
+    float *lw_d = (float*)malloc(sizeof(float)*pp_train_images->n_w);
+    memset(lw_d,0,sizeof(float)*pp_train_images->n_h);
     //sigmoid error and learning rate
     float s ,err ,alpha = 1.0;
     int retrains = 0;
@@ -38,11 +39,13 @@ void trainer(int nn, ppm_t *pp_train_images){
     lbl1:
 
     //Init
-    for (int i = 0; i < pp_train_images->n_w; i++)
+    #pragma omp parallel for
+    for (int i = 0; i < pp_train_images->n_w; i++){
         //w[i][j] = (2.0 * rand())/ RAND_MAX - 1;
         (*pp_train_images->w0)[i]=(sqrt(-2.0*log((double)rand()/RAND_MAX)))*(cos(6.28318530718*(double)rand()/RAND_MAX));
+    }
 
-
+    #pragma omp parallel for
     for (int i = 0; i < pp_train_images->n_h; i++){
         //h[i] = (2.0 * rand()) / RAND_MAX - 1;
         h[i]=(sqrt(-2.0*log((double)rand()/RAND_MAX)))*(cos(6.28318530718*(double)rand()/RAND_MAX));
@@ -52,11 +55,12 @@ void trainer(int nn, ppm_t *pp_train_images){
     for(int k=0;k<nn;k++){
         for (int i = 0; i < pp_train_images->n_h; i++){
             s = 0.0;
+            //#pragma omp parallel for reduction(+:s)
             for (int j = 0; j < pp_train_images->n_w; j++){
                 s += (float)pp_train_images->px[j] * (*pp_train_images->w0)[i];
-
-                lw0[k][i] = sigmoidbis(s);
             }
+
+            lw0[i] = sigmoidbis(s);
         }
     }
     err = 0.;
@@ -68,7 +72,7 @@ void trainer(int nn, ppm_t *pp_train_images){
             s = 0.0;
 
             for (int k = 0; k < pp_train_images->n_h; k++){
-                inc += (lw0[j][k] * h[k]);
+                inc += (lw0[k] * h[k]);
                 s += inc;
             }
 
@@ -80,7 +84,7 @@ void trainer(int nn, ppm_t *pp_train_images){
         //Forming lw_d
         for (int j = 0; j < nn; j++) {
             for (int k = 0; k < pp_train_images->n_h; k++) {
-                lw_d[j][k] = lh_d[j] * h[k] * d_sigmoid(lw0[j][k]);
+                lw_d[k] = lh_d[j] * h[k] * d_sigmoid(lw0[k]);
             }
         }
 
@@ -91,7 +95,7 @@ void trainer(int nn, ppm_t *pp_train_images){
                 s = 0.0;
 
                 for (int l = 0; l < nn; l++){
-                    acc += ((float)pp_train_images->px[l] * lw_d[l][k]);
+                    acc += ((float)pp_train_images->px[l] * lw_d[k]);
                     s += acc;
                 }
 
@@ -105,7 +109,7 @@ void trainer(int nn, ppm_t *pp_train_images){
             s = 0.0;
 
             for (int k = 0; k < nn; k++){
-                accu += (lw0[k][j] * lh_d[k]);
+                accu += (lw0[j] * lh_d[k]);
                 s += accu;
             }
 
@@ -145,7 +149,9 @@ void trainer(int nn, ppm_t *pp_train_images){
               }
         }
     }
-    
+    free(lw_d);
+    free(lw0);
+    free(*pp_train_images->w0);
 }
 
 // fonction qui stocke le résultat et le renvoie
@@ -218,8 +224,8 @@ void testing(ppm_t *pp_images,float *h) {
 void data_test(char *fname, ppm_t *pp_images){
     FILE *entry = fopen(fname,"r");
     char donnees[MAX] = {0};
-    pp_images->n_h = 100;
-    pp_images->n_w = 2500;
+    pp_images->n_h = 1000;
+    pp_images->n_w = 1000;
     float s, _s,l[pp_images->n_h];
     printf("Le fichier à ouvrir est : %s\n", fname);
     
@@ -483,7 +489,7 @@ ppm_t *ppm_open(char *fname)
 
     if (fd)
     {
-        ppm_t *p = malloc(sizeof(ppm_t));
+        ppm_t *p = (ppm_t*)malloc(sizeof(ppm_t));
 
         fscanf(fd, "%c%c\n", &c0, &c1);
 
