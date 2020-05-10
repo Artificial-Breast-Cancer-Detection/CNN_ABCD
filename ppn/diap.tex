@@ -1,0 +1,589 @@
+\documentclass[9pt]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{mathabx}
+\usepackage{mathpazo}
+\usepackage{eulervm}
+\usepackage{natbib}
+
+
+
+
+
+\setbeamercovered{transparent=20}
+%% Load the markdown package
+\usepackage[citations,footnotes,definitionLists,hashEnumerators,smartEllipses,tightLists=false,pipeTables,tableCaptions,hybrid]{markdown}
+%%begin novalidate
+
+\markdownSetup{rendererPrototypes={
+ link = {\href{#2}{#1}},
+ headingOne = {\section{#1}},
+ headingTwo = {\subsection{#1}},
+ headingThree = {\begin{frame}\frametitle{#1}},
+ headingFour = {\begin{block}{#1}},
+ horizontalRule = {\end{block}}
+}}
+%%end novalidate
+
+\usetheme{Dresden}
+\usefonttheme{serif}
+\usecolortheme{rose}
+
+\begin{center}
+{\Large { Université de Versailles Saint-Quentin-en-Yvelines}} \\
+{\Large { Calcul Haut Performance et Simulation }}
+\end{center}
+\title{Réseau de Neurones à convolution \\ Reconnaissance d'images} \\
+\author{\textsc{M$^{elle}$.Baya ABBACI} \\ \textsc{M$^{r}$.Hery ANDRIANANTENAINA} \\ \textsc{M$^{r}$.Khadimou Rassoul DIOP} \\ \textsc{M$^{r}$.Said TADJER }  }
+
+
+
+\begin{document}
+
+\maketitle
+
+
+\begin{frame}
+\renewcommand{\bibfont}{\footnotesize}
+ \tableofcontents
+ \frametitle{Plan de présentation}
+\end{frame}
+
+
+
+\begin{markdown}
+%%begin novalidate
+
+# Introduction
+
+### Introduction
+\begin{itemize}
+    \item L'objectif des chercheurs était de construire une machine capable de reproduire certains aspects de l'intelligence humaine. \pause
+    \item Les réseaux de neurones artificiels réalisés à partir du modèle biologique ne sont rien qu'une tentative de modélisation mathématique du cerveau humain.  \pause
+    \item Ils sont donc conçus pour reproduire certaines de leurs caractéristiques comme: \pause
+    \begin{itemize}
+        \item [\star] La capacité d'apprentissage \pause
+        \item [\star] La capacité de mémoriser l'information \pause
+        \item [\star] La capacité de traiter des informations incomplètes \pause
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+
+##Historique
+
+###Historique
+
+\begin{itemize}
+    \item [\star] \textbf{Mac Culloch} et \textbf{Pitts} ont proposé dès 1943 les premiers neurones formels calqués sur les neurones biologiques. \pause
+    \end{itemize}
+    \begin{itemize}
+    \item [\star] Les réseaux de neurones appelé « NNs» ont donc une histoire relativement jeune (60 ans) mais ce n'est que depuis le début des années 1990 que les applications intéressantes des réseaux de neurones ont vu le jour.
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#Réseaux de Neurones
+
+## Définitions
+### Définitions
+
+\begin{itemize}
+    \item [\star] \textbf{Qu'est-ce qu'un neurone?} \pause
+     \item Un neurone est une cellule d'un système permettant la communication et le traitement de l'information. \pause
+     \end{itemize}
+     \\
+     \begin{itemize}
+     \item [\star] \textbf{Qu'est-ce qu'un neurone artificiel ?} \pause
+     \item Les réseaux de neurones artificiels sont un moyen de modéliser le mécanisme d'apprentissage et de traitement de l'information qui se produit dans le cerveau humain.
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+## Eléments de Neurone artificiel
+### Eléments de Neurone artificiel
+
+\begin{itemize}
+    \item [\star] Les entrées "\textbf{X}" du neurone proviennent soit d’autres éléments "processeurs", soit de l’environnement. 
+      \item [\star]  Les poids "\textbf{W}" déterminent l’influence de chaque entrée. 
+       \item [\star] La fonction de combinaison "\textbf{b}" combine les entrées et les poids. 
+       \item [\star] La fonction de transfert  calcule la sortie "Y" du neurone en fonction de la combinaison en entrée. 
+     \end{itemize}
+    
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+9cm,height=2.5cm]{a.png}
+\end{center}
+\end{figure} 
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+## Configurations des réseaux de Neurones
+### Configurations des réseaux de Neurones 
+
+
+   \begin{itemize}
+    \item [\star] \textbf{Réseaux partiellement
+  connectés:}  Chaque neurone est relié à quelques neurones localisés dans son périmètre.
+  \begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+2.5cm,height=1.3cm]{1.png}
+\end{center}
+\end{figure} 
+   \item [\star] \textbf{Réseaux à connexions  complètes:}  Chaque neurone est lié à tous les autres neurones du réseau.
+   \begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+2.5cm,height=1.3cm]{2.png}
+\end{center}
+\end{figure}
+        \item [\star] \textbf{Réseaux à couches: }  Tous les neurones d'une couche sont connectés aux neurones de la couche en aval.
+        \begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+2.5cm,height=1.3cm]{3.png}
+\end{center}
+\end{figure}
+     \end{itemize}    
+     
+
+      
+      
+
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+## Architecture des réseaux de Neurones 
+### Architecture des réseaux de Neurones 
+
+   \begin{itemize}
+    \item [\star]  Les réseaux non bouclés 
+     \end{itemize}    
+     
+   \begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+6cm,height=2cm]{4.png}
+\end{center}
+\end{figure}
+
+   \begin{itemize}
+    \item [\star]  Les réseaux  bouclés 
+     \end{itemize}    
+     
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+6cm,height=2cm]{5.png}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+## Réseau de neurones a convolution
+### Réseau de neurones a convolution
+  Le réseau de neurones à convolution (CNN) est un type de réseau de neurones artificiels acycliques (feed-forward), ils consistent en un empilage multicouche de perceptrons, Les réseaux neuronaux convolutifs ont de larges applications dans la reconnaissance d'image et vidéo.
+    
+   
+   \begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+9cm,height=3.5cm]{6.png}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+### 
+
+ \begin{itemize}
+     \item [\star] \textbf{Couches de correction (ReLU):} Pour améliorer l’efficacité du traitement on intercale entre les couches de traitement une
+couche qui va opérer une fonction mReLU sur les signaux de sortie: $F (x) = max(0, x)$
+ \end{itemize}
+ 
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+5cm,height=2cm]{7.png}
+\end{center}
+\end{figure} 
+\pause
+ \begin{itemize}
+     \item [\star] \textbf{Couche convolutif:} La couche de convolution est le bloc de construction de base d’un CNN. Trois paramètres
+permettent de dimensionner le volume de la couche de convolution : la profondeur, le pas et
+la marge. \pause
+ \end{itemize}
+ 
+\begin{itemize}
+     \item [\star] \textbf{Couche de pooling (POOL) :} Le pooling est un autre concept trés important des CNNs, ce qui est une forme de sous-
+échantillonnage de l’image. L’image d’entrée est découpée en une série de rectangles de n pixels
+de côté ne se chevauchant pas (pooling).
+ \end{itemize}
+ 
+ 
+
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+## Exemple 
+### Exemple de traitement d'image
+ 
+   
+   \begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+9cm,height=3.5cm]{p1.png}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+### Exemple de traitement d'image
+ 
+   
+   \begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+9cm,height=3.5cm]{p2.png}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+### Exemple de traitement d'image
+ 
+   
+   \begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+9cm,height=3.5cm]{p3.png}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+### Exemple de traitement d'image
+ 
+   
+   \begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+9cm,height=3.5cm]{p5.png}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+### Exemple de traitement d'image
+ 
+   
+   \begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+9cm,height=3.5cm]{p6.png}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#Pre-processing des images
+##Conversion des images 
+###Conversion des images:
+
+   \begin{itemize}
+\item [\star]  Notre source de donnée d’image sont tous en extension png mais nous avons besoin des images en extension pgm.
+\item [\star] C'est pour ça que nous avons converti nos images sous terminal pour avoir l’extension pgm.
+\item [\star] La conversion des images
+en Grayscale permettra de bien appliquer les filtres aux images. Ainsi que bien détecter les contours sur l’image.
+     \end{itemize}    
+     \begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+9.5cm,height=3cm]{11.png}
+\end{center}
+\end{figure}
+   
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+##Détection des bords
+###Détection des bords
+
+   \begin{itemize}
+\item [\star]  Le but de l'opération est de transformer ces image en une autre de mêmes dimensions dans laquelle les contours apparaissent par convention en blanc sur fond noir.  \pause
+\end{itemize}
+\begin{itemize}
+\item [\star] Les contours sont les lieux où on trouve les variations significatives de l'information. Pour la détection des bords, nous avons procédé à l'implémentation de fonctions de filtre.
+     \end{itemize}    
+    
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+###Filtre de Sobel
+
+   \begin{itemize}
+\item [\star]   Le filtre de Sobel est un filtre qui faits des balayage triangulaire pour détecter les bords des images. Le résultat obtenu grâce à l’application de cette filtre est montre sur le slide.
+     \end{itemize}    
+    
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=1.5cm,height=1.5cm]{sans1.png}
+\caption{Image après l'application du filtre de Sobel}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+###Filtre de Kirsch
+
+   \begin{itemize}
+\item [\star]  Le filtre de kirsch est un détecteur de bord non linéaire qui trouve la force de bord maximale dans quelques directions prédéterminées. Mais il y aune différence entre ce filtre et de Sobel ou de Prewitt. 
+\item [\star] La valeur du seuil est choisie empiriquement pour obtenir le meilleur compromis entre la suppression de bruit et la conservation des contours.
+     \end{itemize}    
+    
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=1.5cm,height=1.5cm]{sans3.png}
+\caption{Image après l'application du filtre de Kirsch}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+###Filtre de Prewitt
+
+   \begin{itemize}
+\item [\star]  Le filtre de Prewitt est à peu prêt comme le filtre Sobel mais la différence, c’est au niveau  du balayage, il fait une balayage rectangulaire. n pu obtenir une meilleur résultat  à partir du filtre de Prewitt
+     \end{itemize}    
+    
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=1.5cm,height=1.5cm]{sans4.png}
+\caption{Image après l'application du filtre de Prewitt}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#Entrainement du réseau
+###Entrainement du réseau de Neurones
+
+   \begin{itemize}
+    \item [\star]  BACK-PROPAGATION
+    \item [\star]  POIDS ET FONCTION D’ACTIVATION
+    \item [\star]  GRADIENT DE DESCENTE
+     \end{itemize}    
+    
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+###Back-propagation
+ 
+ \begin{itemize}
+    \item [\star]  PROPAGATION DE LA PERTE TOTALE
+    \item [\star]  MISE À JOUR DES POIDS
+     \end{itemize}    
+  
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+###Fonctions d'activation
+ 
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+7.5cm,height=4.5cm]{9.png}
+\end{center}
+\end{figure}
+  
+
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+###Gradient conjugué
+ 
+
+   \begin{itemize}
+    \item [\star]  MINIMISATION DE L’ERREUR
+    \item [\star] PEU COÛTEUX ET DISPOSE DE BONNES PROPRIÉTÉS.
+     \end{itemize}    
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#Tester le réseau
+
+### Test du réseau de neurones
+
+   \begin{itemize}
+    \item [\star]  DEUX RÉSULTATS POSSIBLES
+    \item [\star]  IMPLÉMENTATION
+    \item [\star]  ÉVALUATION DES MAUVAISES CLASSIFICATIONS
+     \end{itemize}    
+    
+
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+### Les sorties
+
+   \begin{itemize}
+    \item [\star]  DÉTÉCTION DE TUMEUR
+    \item [\star]  NON DÉTÉCTION DE TUMEUR
+     \end{itemize}    
+    
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+### Implémentation
+
+   \begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+7.5cm,height=4.5cm]{10.png}
+\end{center}
+\end{figure}
+  
+    
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+### Evaluation des mauvaises classification
+
+   \begin{itemize}
+    \item [\star]  NOMBRE D’ERREURS A CHAQUE TEST
+    \item [\star]  POURCENTAGE
+     \end{itemize}    
+    
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+#Résultat et conclusion
+
+### Résultat
+
+   
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=
+9cm,height=4.5cm]{r.png}
+\end{center}
+\end{figure}
+
+
+\end{frame}
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%novalidate
+\end{markdown}
+
+\begin{frame}
+\renewcommand{\bibfont}{\footnotesize}
+\frametitle{Bibliographie}
+
+\bibliographystyle{apalike}
+\bibliography{refs}
+\begin{itemize}
+    \item [] [1] https://fr.wikipedia.org/wiki/D\%C3\%A9tection\_de\_contours.\\
+    \item [] [2]https://www.sciencedirect.com/science/article/pii/S2405959518304934.\\
+    \end{itemize}
+    \begin{itemize}
+    
+    \item [] [3] https://www.kaggle.com/paultimothymooney/breast- histopathology-images.
+\end{itemize} 
+
+
+\end{frame}
+
+
+\end{document}
