@@ -224,8 +224,8 @@ void testing(ppm_t *pp_images,float *h) {
 void data_test(char *fname, ppm_t *pp_images){
     FILE *entry = fopen(fname,"r");
     char donnees[MAX] = {0};
-    pp_images->n_h = 1000;
-    pp_images->n_w = 1000;
+    pp_images->n_h = 2500;
+    pp_images->n_w = 2500;
     float s, _s,l[pp_images->n_h];
     printf("Le fichier à ouvrir est : %s\n", fname);
     
