@@ -12,10 +12,10 @@ int main(int argc, char **argv)
     if(argc<2){
       return printf("Usage : [train ppm] \n"),-1;
     }
-    omp_set_num_threads(4);
 
     char* current_test_char = "Cancer not detected\n";
     int bad_test_classifications = 0,total_test_classifications=0;
+    float tdeb,tfin;
 
     char *path = argv[1];
     struct dirent **list = NULL;
@@ -25,10 +25,11 @@ int main(int argc, char **argv)
       perror("scandir");
       return 1;
     }
-    
+
     ppm_t *train_images = (ppm_t*)malloc(sizeof(ppm_t));
     //Loading images pre-processed, and training
 
+    tdeb = omp_get_wtime();
     for(int i=2;i<nb_files;i++){
       char buf[512];
       snprintf(buf,512,"%s%s",path,list[i]->d_name);
@@ -43,6 +44,10 @@ int main(int argc, char **argv)
         total_test_classifications++;
         ppm_close(train_images);
     }
+    tfin = omp_get_wtime();
+    printf("Fin de la boucle\n");
+    printf("Temps elapsed : %f s\n", tfin-tdeb);
+
     //Percentage of bad test classifications
     printf("bad test classifications %d\n", bad_test_classifications );
     printf("total classifications %d\n",total_test_classifications);

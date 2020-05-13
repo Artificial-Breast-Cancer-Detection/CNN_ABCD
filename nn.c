@@ -55,7 +55,7 @@ void trainer(int nn, ppm_t *pp_train_images){
     for(int k=0;k<nn;k++){
         for (int i = 0; i < pp_train_images->n_h; i++){
             s = 0.0;
-            //#pragma omp parallel for reduction(+:s)
+
             for (int j = 0; j < pp_train_images->n_w; j++){
                 s += (float)pp_train_images->px[j] * (*pp_train_images->w0)[i];
             }
@@ -70,7 +70,7 @@ void trainer(int nn, ppm_t *pp_train_images){
         //forming lh_d
         for (int j = 0; j < nn; j++) {
             s = 0.0;
-
+        
             for (int k = 0; k < pp_train_images->n_h; k++){
                 inc += (lw0[k] * h[k]);
                 s += inc;
@@ -93,12 +93,11 @@ void trainer(int nn, ppm_t *pp_train_images){
         for (int j = 0; j < pp_train_images->n_w; j++) {
             for (int k = 0; k < pp_train_images->n_h; k++) {
                 s = 0.0;
-
+                
                 for (int l = 0; l < nn; l++){
                     acc += ((float)pp_train_images->px[l] * lw_d[k]);
                     s += acc;
                 }
-
                 (*pp_train_images->w0)[k] -= (alpha * s);  
             }
         }
@@ -170,6 +169,7 @@ void testing(ppm_t *pp_images,float *h) {
     float s, _s,l[pp_images->n_h];
     FILE *poids = fopen("./data.txt","w");
 
+    //#pragma omp parallel for
     for (int i = 0; i < pp_images->n_h; i++)
     {
         s = 0.0;
@@ -183,6 +183,7 @@ void testing(ppm_t *pp_images,float *h) {
     s = 0.0;
     float accu = 0.;
 
+    //#pragma omp parallel for
     for (int i = 0; i < pp_images->n_h; i++){
         accu += (l[i] * h[i]);
         s += accu;

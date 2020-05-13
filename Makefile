@@ -1,6 +1,6 @@
 ICC = icc
 
-CFLAGS=-std=c99 -Wall
+CFLAGS=-std=c99 -Wall -pg -DNDEBUG
 DFLAGS=-g3
 LFLAGS=-lm
 IFLAGS = -mkl
