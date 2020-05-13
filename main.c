@@ -35,7 +35,7 @@ int main(int argc, char **argv)
       snprintf(buf,512,"%s%s",path,list[i]->d_name);
       train_images = ppm_open(buf);
       printf("Resolution: %u Pixels, %u MPixels\n", (train_images->h * train_images->w), (train_images->h * train_images->w) / 1000000);
-      trainer(1,train_images);
+      trainer(1,train_images,"./data.txt");
       //data_test("./data.txt",train_images);
       if (current_test_char == output_test_char(get_res(train_images),train_images)){
             bad_test_classifications++;

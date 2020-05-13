@@ -64,10 +64,10 @@ void ppm_close(ppm_t *p);
 
 ppm_t *ppm_create(u64 h, u64 w, u64 t);
 
-void testing(ppm_t *pp_images,float *h);
+void testing(ppm_t *pp_images,float *h,char *fname);
 
 // nn = nombre d'itérations
-void trainer(int nn, ppm_t *pp_train_images);
+void trainer(int nn, ppm_t *pp_train_images,char *fname);
 
 // test des résultats enregistrés dans data.txt
 void data_test(char *fname,ppm_t *pp_images);

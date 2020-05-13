@@ -15,7 +15,7 @@ inline float sigmoidbis(float x)
 }
 
 //fonction de train qui renvoie les poids du réseau
-void trainer(int nn, ppm_t *pp_train_images){
+void trainer(int nn, ppm_t *pp_train_images,char *fname){
     
     //Layer inputs : n_w and hidden layer n_h
     pp_train_images->n_w = 2500;
@@ -143,7 +143,7 @@ void trainer(int nn, ppm_t *pp_train_images){
                 goto lbl2;
             else
               if (mode == '2'){
-                testing(pp_train_images,h);
+                testing(pp_train_images,h,fname);
                 break;
               }
         }
@@ -164,10 +164,10 @@ const char* get_res(ppm_t *pp_images){
     return pp_images->result;
 }
 
-void testing(ppm_t *pp_images,float *h) {
+void testing(ppm_t *pp_images,float *h,char *fname) {
 
     float s, _s,l[pp_images->n_h];
-    FILE *poids = fopen("./data.txt","w");
+    FILE *poids = fopen(fname,"w");
 
     //#pragma omp parallel for
     for (int i = 0; i < pp_images->n_h; i++)
